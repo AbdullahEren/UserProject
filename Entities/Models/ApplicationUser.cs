@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNet.Identity.EntityFramework;
+﻿using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -13,6 +13,9 @@ namespace Entities.Models
 {
     public class ApplicationUser : IdentityUser
     {
+        [Required(ErrorMessage = "Id is required.")]
+        [Key]
+        public int Id { get; set; }
 
         [Required(ErrorMessage = "Name is required.")]
         public string Name { get; set; }
@@ -37,10 +40,11 @@ namespace Entities.Models
         [Required(ErrorMessage = "Company Id is required.")]
         [ForeignKey(nameof(Company))]
         public int CompanyId { get; set; }
-
-        [Required(ErrorMessage = "Company is required.")]
         
         public Company Company { get; set; }
+
+        [JsonIgnore]
+        public bool IsDeleted { get; set; } = false;
 
     }
 
