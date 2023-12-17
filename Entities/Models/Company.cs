@@ -10,6 +10,8 @@ namespace Entities.Models
 {
     public class Company
     {
+        [JsonIgnore]
+        [Key]
         public int CompanyId { get; set; }
 
         [Required(ErrorMessage = "Company Name is required.")]
