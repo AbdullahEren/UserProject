@@ -1,4 +1,5 @@
-﻿using Entities.Models;
+﻿using Entities.Dtos.CompanyDto;
+using Entities.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,8 +12,8 @@ namespace Services.Contracts
     {
         Task<IEnumerable<Company>> GetAllCompaniesAsync(bool trackChanges);
         Task<Company> GetCompanyAsync(int companyId, bool trackChanges);
-        Task CreateCompany(Company company);
+        Task CreateCompany(CompanyForCreationDto companyDto);
         Task DeleteCompany(Company company);
-        Task UpdateCompany(int companyId,Company company);
+        Task UpdateCompany(int companyId,CompanyForUpdateDto companyDto);
     }
 }
