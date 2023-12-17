@@ -28,11 +28,5 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
-using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
-    var dbContext = services.GetRequiredService<RepositoryContext>();
-    await ServiceExtensions.SeedUsersAsync(services, dbContext);
-}
-
+ServiceExtensions.SeedUsersAsync(app.Services).GetAwaiter().GetResult();
 app.Run();

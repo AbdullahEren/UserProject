@@ -30,7 +30,7 @@ namespace UserProject.Infrastructure.Extensions
             }).AddEntityFrameworkStores<RepositoryContext>();
         }
 
-        public static async Task SeedUsersAsync(IServiceProvider serviceProvider, RepositoryContext context)
+        public static async Task SeedUsersAsync(IServiceProvider serviceProvider)
         {
             UserManager<ApplicationUser> userManager = serviceProvider
                 .CreateScope()
