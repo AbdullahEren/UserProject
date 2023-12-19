@@ -11,8 +11,8 @@ namespace Repositories.Contracts
     {
         Task<IEnumerable<Company>> GetAllCompaniesAsync(bool trackChanges);
         Task<Company> GetCompanyAsync(int companyId, bool trackChanges);
-        Task CreateCompany(Company company);
-        Task DeleteCompany(Company company);
-        Task UpdateCompany(int companyId,Company company);
+        Task CreateCompanyAsync(Company company);
+        Task DeleteCompanyAsync(Company company);
+        Task UpdateCompanyAsync(int companyId,Company company);
     }
 }

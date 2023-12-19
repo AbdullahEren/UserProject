@@ -12,11 +12,9 @@ namespace Services.Contracts
     public interface IAuthService
     {
         Task<IdentityResult> RegisterUser(UserForRegistrationDto userDto);
-        IEnumerable<ApplicationRole> Roles { get; }
-        IEnumerable<ApplicationUser> Users { get; }
         Task<IEnumerable<ApplicationUser>> GetOneUser(string userName);
         Task<IEnumerable<ApplicationUser>> GetAllUsers();
-        Task<IdentityResult> UpdateUser(UserForUpdateDto userDto);
+        Task<IdentityResult> UpdateUser(string userName,UserForUpdateDto userDto);
         Task<IdentityResult> DeleteOneUser(string userName);
 
     }

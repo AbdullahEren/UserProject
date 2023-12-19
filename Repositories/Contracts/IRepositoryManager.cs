@@ -9,6 +9,8 @@ namespace Repositories.Contracts
     public interface IRepositoryManager
     {
         ICompanyRepository Company { get; }
+        IAddressRepository Address { get; }
+        IGeoLocationRepository GeoLocation { get; }
         
         Task SaveAsync();
     }

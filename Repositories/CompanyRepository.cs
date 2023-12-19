@@ -22,15 +22,15 @@ namespace Repositories
             return company.SingleOrDefault();
         }
 
-        public async Task UpdateCompany(int companyId, Company company)
+        public async Task UpdateCompanyAsync(int companyId, Company company)
         {
           company.CompanyId = companyId;
           await UpdateAsync(company);
         }
 
-        public async Task CreateCompany(Company company)=> await CreateAsync(company);
+        public async Task CreateCompanyAsync(Company company)=> await CreateAsync(company);
 
-        public async Task DeleteCompany(Company company)=> await DeleteAsync(company);
+        public async Task DeleteCompanyAsync(Company company)=> await DeleteAsync(company);
 
     }
 }
