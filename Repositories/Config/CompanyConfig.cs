@@ -26,6 +26,7 @@ namespace Repositories.Config
             builder.Property(c => c.Bs)
                 .IsRequired();
 
+
             builder.HasData(
                     new Company
                     {

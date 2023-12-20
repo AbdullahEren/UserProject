@@ -9,7 +9,7 @@ namespace Repositories.Contracts
 {
     public interface IAddressRepository : IRepositoryBase<Address>
     {
-        Task<Address> GetAddressByUserIdAsync(int userId);
+        Task<IEnumerable<Address>> GetAddressByUserIdAsync(int userId);
         Task CreateAddressAsync( Address address);
         Task DeleteAddressAsync(Address address);
         Task UpdateAddressAsync(Address address);

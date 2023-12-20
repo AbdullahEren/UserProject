@@ -19,12 +19,11 @@ namespace Entities.Models
 
         public Address? Address { get; set; }
 
-        [Url(ErrorMessage = "Invalid Website Url.")]
-        public string Website { get; set; }
+        
+        public string? Website { get; set; }
 
-        [Required(ErrorMessage = "Company Id is required.")]
         [ForeignKey(nameof(Company))]
-        public int CompanyId { get; set; }
+        public int? CompanyId { get; set; }
         
         public Company? Company { get; set; }
 

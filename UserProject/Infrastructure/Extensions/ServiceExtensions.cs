@@ -4,6 +4,10 @@ using Microsoft.EntityFrameworkCore;
 using Repositories;
 using Microsoft.Extensions.DependencyInjection;
 using System.Net;
+using Repositories.Contracts;
+using Services;
+using Services.Contracts;
+using UserProject.Infrastructure.Mapper;
 
 
 namespace UserProject.Infrastructure.Extensions
@@ -17,6 +21,23 @@ namespace UserProject.Infrastructure.Extensions
                                               b => b.MigrationsAssembly("UserProject")));
 
             
+        }
+
+        public static void ConfigureRepositories(this IServiceCollection services)
+        {
+            services.AddScoped<ICompanyRepository, CompanyRepository>();
+            services.AddScoped<IAddressRepository, AddressRepository>();
+            services.AddScoped<IGeoLocationRepository, GeoLocationRepository>();
+            services.AddScoped<IRepositoryManager, RepositoryManager>();
+        }
+
+        public static void ConfigureServices(this IServiceCollection services)
+        {
+            services.AddScoped<IAuthService, AuthManager>();
+            services.AddScoped<IAddressService, AddressManager>();
+            services.AddScoped<ICompanyService, CompanyManager>();
+
+            services.AddAutoMapper(typeof(MappingProfile).Assembly);
         }
 
         public static void ConfigureIdentity(this IServiceCollection services)

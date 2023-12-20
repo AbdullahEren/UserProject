@@ -1,6 +1,9 @@
 ﻿using AutoMapper;
 using Entities.Dtos.CompanyDto;
 using Entities.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Repositories;
 using Repositories.Contracts;
 using Services.Contracts;
 using System;
@@ -15,11 +18,15 @@ namespace Services
     {
         private readonly IRepositoryManager _manager;
         private readonly IMapper _mapper;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly RepositoryContext _context;
 
-        public CompanyManager(IRepositoryManager manager, IMapper mapper)
+        public CompanyManager(IRepositoryManager manager, IMapper mapper, RepositoryContext context, UserManager<ApplicationUser> userManager)
         {
             _manager = manager;
             _mapper = mapper;
+            _userManager = userManager;
+            _context = context;
         }
 
         public async Task CreateCompanyAsync(CompanyForCreationDto companyDto)
@@ -35,17 +42,25 @@ namespace Services
             await _manager.SaveAsync();
         }
 
-        public async Task DeleteCompanyAsync(int companyId,Company company)
+        public async Task DeleteCompanyAsync(int companyId)
         {
             var companyEntity = await _manager.Company.GetCompanyAsync(companyId, false);
             if (companyEntity == null)
             {
                 throw new ArgumentNullException(nameof(companyEntity));
             }
-            await _manager.Company.DeleteCompanyAsync(company);
+
+            var usersWithCompany = await _context.Users.Where(u => u.CompanyId == companyId).ToListAsync();
+            foreach (var user in usersWithCompany)
+            {
+                user.CompanyId = null;
+            }
+
+            await _manager.Company.DeleteCompanyAsync(companyEntity);
             await _manager.SaveAsync();
-            
+
         }
+
 
         public async Task<IEnumerable<Company>> GetAllCompaniesAsync(bool trackChanges)
         {

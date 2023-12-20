@@ -28,9 +28,7 @@ namespace Entities.Dtos.UserDto
         [Required(ErrorMessage = "PhoneNumber is required.")]
         [Phone(ErrorMessage = "Invalid Phone Number.")]
         public string? PhoneNumber { get; init; }
-        public Address? Address { get; init; }
 
-        [Url(ErrorMessage = "Invalid Website Url.")]
         public string? Website { get; init; }
 
         [Required(ErrorMessage = "Company Id is required.")]

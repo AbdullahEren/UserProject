@@ -12,8 +12,8 @@ namespace Services.Contracts
     public interface IAuthService
     {
         Task<IdentityResult> RegisterUser(UserForRegistrationDto userDto);
-        Task<IEnumerable<ApplicationUser>> GetOneUser(string userName);
-        Task<IEnumerable<ApplicationUser>> GetAllUsers();
+        Task<IEnumerable<UserForReadDto>> GetOneUser(string userName);
+        Task<IEnumerable<UserForReadDto>> GetAllUsers();
         Task<IdentityResult> UpdateUser(string userName,UserForUpdateDto userDto);
         Task<IdentityResult> DeleteOneUser(string userName);
 

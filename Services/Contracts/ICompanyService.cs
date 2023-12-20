@@ -13,7 +13,7 @@ namespace Services.Contracts
         Task<IEnumerable<Company>> GetAllCompaniesAsync(bool trackChanges);
         Task<Company> GetCompanyAsync(int companyId, bool trackChanges);
         Task CreateCompanyAsync(CompanyForCreationDto companyDto);
-        Task DeleteCompanyAsync(int companyId,Company company);
+        Task DeleteCompanyAsync(int companyId);
         Task UpdateCompanyAsync(int companyId,CompanyForUpdateDto companyDto);
     }
 }

@@ -15,10 +15,11 @@ namespace Repositories
         {
         }
 
-        public async Task<Address> GetAddressByUserIdAsync(int userId)
+        public async Task<IEnumerable<Address>> GetAddressByUserIdAsync(int userId)
         {
             var address = await FindByConditionAsync(a => a.ApplicationUserId.Equals(userId),false);
-            return address.SingleOrDefault();
+            
+            return address;
         }
 
         public async Task CreateAddressAsync( Address address) => await CreateAsync(address);

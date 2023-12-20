@@ -22,11 +22,10 @@ namespace Entities.Models
         public decimal Lng { get; set; }
 
         [JsonIgnore]
-        [Required(ErrorMessage = "Address Id is required.")]
         [ForeignKey(nameof(Address))]
-        public int AddressId { get; set; }
-
+        public int? AddressId { get; set; }
+        public virtual Address? Address { get; set; }
         [JsonIgnore]
-        public Address Address { get; set; }
+        public bool IsDeleted { get; set; } = false;
     }
 }

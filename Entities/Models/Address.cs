@@ -27,14 +27,18 @@ namespace Entities.Models
 
         [Required(ErrorMessage = "Zip Code is required.")]
         public string ZipCode { get; set; }
-        public GeoLocation? Geo { get; set; }
+        [JsonIgnore]
+        public virtual GeoLocation? Geo { get; set; }
 
         [JsonIgnore]
         [ForeignKey(nameof(ApplicationUser))]
-        public int ApplicationUserId { get; set; }
+        public int? ApplicationUserId { get; set; }
 
         [JsonIgnore]
         
-        public ApplicationUser? ApplicationUser { get; set; }
+        public virtual ApplicationUser? ApplicationUser { get; set; }
+
+        [JsonIgnore]
+        public bool IsDeleted { get; set; } = false;
     }
 }

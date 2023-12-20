@@ -26,9 +26,7 @@ namespace Repositories.Config
             builder.HasOne(a => a.ApplicationUser)
                 .WithOne(u => u.Address)
                 .HasForeignKey<Address>(a => a.ApplicationUserId)
-                .IsRequired()
-                .OnDelete(DeleteBehavior.Cascade);
-
+                .OnDelete(DeleteBehavior.Restrict);
 
         }
     }

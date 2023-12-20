@@ -27,9 +27,9 @@ namespace Repositories.Config
             builder.HasOne(u => u.Company)
                    .WithMany()
                    .HasForeignKey(u => u.CompanyId)
-                   .IsRequired();
+                   .OnDelete(DeleteBehavior.Restrict);
 
-
+            builder.Property(u => u.CompanyId).IsRequired(false);
         }
 
     }

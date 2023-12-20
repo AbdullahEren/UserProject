@@ -24,9 +24,7 @@ namespace Repositories.Config
             builder.HasOne(g => g.Address)
                 .WithOne(a => a.Geo)
                 .HasForeignKey<GeoLocation>(g => g.AddressId)
-                .IsRequired()
-                .OnDelete(DeleteBehavior.Cascade);
-
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

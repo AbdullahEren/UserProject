@@ -67,8 +67,8 @@ namespace UserProject.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Website = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CompanyId = table.Column<int>(type: "int", nullable: false),
+                    Website = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CompanyId = table.Column<int>(type: "int", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -92,8 +92,7 @@ namespace UserProject.Migrations
                         name: "FK_AspNetUsers_Companies_CompanyId",
                         column: x => x.CompanyId,
                         principalTable: "Companies",
-                        principalColumn: "CompanyId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "CompanyId");
                 });
 
             migrationBuilder.CreateTable(
@@ -106,7 +105,8 @@ namespace UserProject.Migrations
                     Suite = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     City = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ZipCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ApplicationUserId = table.Column<int>(type: "int", nullable: false)
+                    ApplicationUserId = table.Column<int>(type: "int", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -116,7 +116,7 @@ namespace UserProject.Migrations
                         column: x => x.ApplicationUserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -212,7 +212,8 @@ namespace UserProject.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Lat = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Lng = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    AddressId = table.Column<int>(type: "int", nullable: false)
+                    AddressId = table.Column<int>(type: "int", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -222,13 +223,13 @@ namespace UserProject.Migrations
                         column: x => x.AddressId,
                         principalTable: "Addresses",
                         principalColumn: "AddressId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.InsertData(
                 table: "AspNetRoles",
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
-                values: new object[] { 1, "e2600421-b8c3-4cc5-94cf-329396ee226c", "User", "USER" });
+                values: new object[] { 1, "0960df0c-5cd1-40a8-b810-089fbe367b7b", "User", "USER" });
 
             migrationBuilder.InsertData(
                 table: "Companies",
@@ -251,7 +252,8 @@ namespace UserProject.Migrations
                 name: "IX_Addresses_ApplicationUserId",
                 table: "Addresses",
                 column: "ApplicationUserId",
-                unique: true);
+                unique: true,
+                filter: "[ApplicationUserId] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -301,7 +303,8 @@ namespace UserProject.Migrations
                 name: "IX_GeoLocations_AddressId",
                 table: "GeoLocations",
                 column: "AddressId",
-                unique: true);
+                unique: true,
+                filter: "[AddressId] IS NOT NULL");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

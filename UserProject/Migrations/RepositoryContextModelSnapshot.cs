@@ -30,12 +30,15 @@ namespace UserProject.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AddressId"), 1L, 1);
 
-                    b.Property<int>("ApplicationUserId")
+                    b.Property<int?>("ApplicationUserId")
                         .HasColumnType("int");
 
                     b.Property<string>("City")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Street")
                         .IsRequired()
@@ -52,7 +55,8 @@ namespace UserProject.Migrations
                     b.HasKey("AddressId");
 
                     b.HasIndex("ApplicationUserId")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[ApplicationUserId] IS NOT NULL");
 
                     b.ToTable("Addresses");
                 });
@@ -90,7 +94,7 @@ namespace UserProject.Migrations
                         new
                         {
                             Id = 1,
-                            ConcurrencyStamp = "e2600421-b8c3-4cc5-94cf-329396ee226c",
+                            ConcurrencyStamp = "0960df0c-5cd1-40a8-b810-089fbe367b7b",
                             Name = "User",
                             NormalizedName = "USER"
                         });
@@ -107,7 +111,7 @@ namespace UserProject.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
-                    b.Property<int>("CompanyId")
+                    b.Property<int?>("CompanyId")
                         .HasColumnType("int");
 
                     b.Property<string>("ConcurrencyStamp")
@@ -162,7 +166,6 @@ namespace UserProject.Migrations
                         .HasColumnType("nvarchar(256)");
 
                     b.Property<string>("Website")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -285,8 +288,11 @@ namespace UserProject.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("GeoLocationId"), 1L, 1);
 
-                    b.Property<int>("AddressId")
+                    b.Property<int?>("AddressId")
                         .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
 
                     b.Property<decimal>("Lat")
                         .HasColumnType("decimal(18,2)");
@@ -297,7 +303,8 @@ namespace UserProject.Migrations
                     b.HasKey("GeoLocationId");
 
                     b.HasIndex("AddressId")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[AddressId] IS NOT NULL");
 
                     b.ToTable("GeoLocations");
                 });
@@ -410,8 +417,7 @@ namespace UserProject.Migrations
                     b.HasOne("Entities.Models.ApplicationUser", "ApplicationUser")
                         .WithOne("Address")
                         .HasForeignKey("Entities.Models.Address", "ApplicationUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("ApplicationUser");
                 });
@@ -420,9 +426,7 @@ namespace UserProject.Migrations
                 {
                     b.HasOne("Entities.Models.Company", "Company")
                         .WithMany("ApplicationUsers")
-                        .HasForeignKey("CompanyId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CompanyId");
 
                     b.Navigation("Company");
                 });
@@ -432,8 +436,7 @@ namespace UserProject.Migrations
                     b.HasOne("Entities.Models.Address", "Address")
                         .WithOne("Geo")
                         .HasForeignKey("Entities.Models.GeoLocation", "AddressId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Address");
                 });

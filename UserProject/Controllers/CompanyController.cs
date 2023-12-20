@@ -50,8 +50,7 @@ namespace UserProject.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCompany(int id)
         {
-            var company = await _companyService.GetCompanyAsync(id, trackChanges: false);
-            await _companyService.DeleteCompanyAsync(id, company);
+            await _companyService.DeleteCompanyAsync(id);
             return Ok();
         }
     }
