@@ -30,5 +30,8 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.ConfigureAndCheckMigration();
 ServiceExtensions.SeedUsersAsync(app.Services).GetAwaiter().GetResult();
+
 app.Run();

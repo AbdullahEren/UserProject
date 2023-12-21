@@ -6,6 +6,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Entities.Dtos.AddressDtos;
 
 namespace Entities.Dtos.UserDto
 {
@@ -15,7 +16,7 @@ namespace Entities.Dtos.UserDto
         public string? Name { get; init; }
         public string? UserName { get; init; }
         public string? Email { get; init; }
-        public Address? Address { get; init; }
+        public AddressForReadDto? Address { get; init; }
         public string? PhoneNumber { get; init; }
         public string? Website { get; init; }
         public Company? Company { get; init; }

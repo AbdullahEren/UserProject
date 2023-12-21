@@ -40,7 +40,7 @@ namespace Services
                 throw new Exception("The User is null");
             }
 
-            var addressEntity = await _context.Addresses.Where(u => u.ApplicationUserId == userId).FirstOrDefaultAsync();
+            var addressEntity = await _context.Addresses.Where(u => u.ApplicationUserId == userId && u.IsDeleted == false).FirstOrDefaultAsync();
             if (addressEntity != null)
             {
                 throw new Exception("The User already has an address");
@@ -62,12 +62,12 @@ namespace Services
             {
                 throw new ArgumentNullException(nameof(addressDto));
             }
-            var user = await _context.Users.Where(u => u.Id == userId).FirstOrDefaultAsync();
+            var user = await _context.Users.Where(u => u.Id == userId && u.IsDeleted == false).FirstOrDefaultAsync();
             if (user == null)
             {
                 throw new ArgumentNullException(nameof(user));
             }
-            var addressEntity = await _context.Addresses.Include(u => u.Geo).Where(u => u.ApplicationUserId == userId).FirstOrDefaultAsync();
+            var addressEntity = await _context.Addresses.Include(u => u.Geo).Where(u => u.ApplicationUserId == userId && u.IsDeleted == false).FirstOrDefaultAsync();
             if (addressEntity == null)
             {
                 throw new Exception("The User don't have an address");
@@ -84,12 +84,12 @@ namespace Services
 
         public async Task DeleteAddressAsync(int userId)
         {
-            var user = await _context.Users.Where(u => u.Id == userId).FirstOrDefaultAsync();
+            var user = await _context.Users.Where(u => u.Id == userId && u.IsDeleted == false).FirstOrDefaultAsync();
             if (user == null)
             {
                 throw new ArgumentNullException(nameof(user));
             }
-            var addressEntity = await _context.Addresses.Include(u => u.Geo).Where(u => u.ApplicationUserId == userId).FirstOrDefaultAsync();
+            var addressEntity = await _context.Addresses.Include(u => u.Geo).Where(u => u.ApplicationUserId == userId && u.IsDeleted == false).FirstOrDefaultAsync();
             if (addressEntity == null)
             {
                 throw new Exception("The User don't have an address");
@@ -101,7 +101,7 @@ namespace Services
 
         public async Task<IEnumerable<AddressForReadDto>> GetAddressByUserIdAsync(int userId)
         {
-            var address = await _context.Addresses.Include(u => u.Geo).Where(u => u.ApplicationUserId == userId).ToListAsync();
+            var address = await _context.Addresses.Include(u => u.Geo).Where(u => u.ApplicationUserId == userId && u.IsDeleted == false).ToListAsync();
 
             if (address == null)
             {

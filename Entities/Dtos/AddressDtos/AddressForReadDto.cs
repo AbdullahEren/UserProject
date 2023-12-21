@@ -11,12 +11,10 @@ namespace Entities.Dtos.AddressDtos
 {
     public record AddressForReadDto
     {
-        public int AddressId { get; init; }
         public string Street { get; init; }
         public string Suite { get; init; }
         public string City { get; init; }
         public string ZipCode { get; init; }
-        public int? ApplicationUserId { get; init; }
         public GeoLocationDto? Geo { get; init; }
     }
 }

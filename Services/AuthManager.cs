@@ -4,6 +4,7 @@ using Entities.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Repositories;
 using Repositories.Contracts;
 using Services.Contracts;
 using System;
@@ -20,32 +21,37 @@ namespace Services
         private readonly IMapper _mapper;
         private readonly IConfiguration _configuration;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly RepositoryContext _context;
 
         private ApplicationUser? _user;
 
-        public AuthManager(IRepositoryManager manager, IMapper mapper, IConfiguration configuration, UserManager<ApplicationUser> userManager)
+        public AuthManager(IRepositoryManager manager, IMapper mapper, IConfiguration configuration, UserManager<ApplicationUser> userManager, RepositoryContext context)
         {
             _manager = manager;
             _mapper = mapper;
             _configuration = configuration;
             _userManager = userManager;
+            _context = context;
         }
 
         public async Task<IdentityResult> DeleteOneUser(string userName)
         {
-            var user = await _userManager.FindByNameAsync(userName);
+            var user = await _context.Users.Where(u => u.UserName == userName && u.IsDeleted == false).FirstOrDefaultAsync();
             if (user == null)
             {
                 throw new ArgumentNullException(nameof(user));
             }
             user.IsDeleted = true;
-            if (user.Address != null)
+            var address = await _context.Addresses.Where(u => u.ApplicationUserId.Equals(user.Id)).FirstOrDefaultAsync();
+            
+            if (address != null)
             {
-                user.Address.IsDeleted = true;
 
-                if (user.Address.Geo != null)
+                address.IsDeleted = true;
+                var geo = await _context.GeoLocations.Where(u => u.AddressId.Equals(address.AddressId)).FirstOrDefaultAsync();
+                if (geo != null)
                 {
-                    user.Address.Geo.IsDeleted = true;
+                    geo.IsDeleted = true;
                 }
             }
             var result = await _userManager.UpdateAsync(user);
@@ -111,7 +117,7 @@ namespace Services
                 throw new ArgumentNullException(nameof(company));
             }
 
-            var userEntity = await _userManager.FindByNameAsync(userName);
+            var userEntity = await _context.Users.Where(u => u.UserName == userName && u.IsDeleted == false).FirstOrDefaultAsync();
             if (userEntity == null)
             {
                 throw new ArgumentNullException(nameof(userEntity));

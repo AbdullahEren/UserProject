@@ -27,6 +27,8 @@ namespace Entities.Dtos.AddressDtos
 
         [JsonIgnore]
         public int? ApplicationUserId { get; init; }
+
+        [Required(ErrorMessage = "Geo Location field is required.")]
         public virtual GeoLocationDto? Geo { get; set;}
     }
 }

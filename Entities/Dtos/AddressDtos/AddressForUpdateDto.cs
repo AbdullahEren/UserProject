@@ -24,6 +24,7 @@ namespace Entities.Dtos.AddressDtos
 
         [Required(ErrorMessage = "Zip Code is required.")]
         public string ZipCode { get; init; }
+        [Required(ErrorMessage = "Geo Location field is required.")]
         public virtual GeoLocationDto? Geo { get; set; }
     }
 }
