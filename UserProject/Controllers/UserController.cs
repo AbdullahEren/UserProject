@@ -6,18 +6,20 @@ using Entities.Dtos.UserDto;
 using Entities.Models;
 using Microsoft.AspNetCore.Identity;
 using Services.Contracts;
+using Microsoft.AspNetCore.Authorization;
 
 namespace UserProject.Controllers
 {
     [Route("api/users")]
     [ApiController]
+    [Authorize(Roles = "User")]
     public class UserController : ControllerBase
     {
-        private readonly IAuthService _authService;
+        private readonly IUserService _userService;
 
-        public UserController(IAuthService authService)
+        public UserController(IUserService userService)
         {
-            _authService = authService;
+            _userService = userService;
         }
 
         [HttpGet]
@@ -25,7 +27,7 @@ namespace UserProject.Controllers
         {
             try
             {
-                var users = await _authService.GetAllUsers();
+                var users = await _userService.GetAllUsers();
                 return Ok(users);
             }
             catch (Exception ex)
@@ -39,7 +41,7 @@ namespace UserProject.Controllers
         {
             try
             {
-                var user = await _authService.GetOneUser(userName);
+                var user = await _userService.GetOneUser(userName);
                 return Ok(user);
             }
             catch (Exception ex)
@@ -53,7 +55,7 @@ namespace UserProject.Controllers
         {
             try
             {
-                var result = await _authService.UpdateUser(userName, userDto);
+                var result = await _userService.UpdateUser(userName, userDto);
 
                 if (result.Succeeded)
                 {
@@ -73,7 +75,7 @@ namespace UserProject.Controllers
         {
             try
             {
-                var result = await _authService.DeleteOneUser(userName);
+                var result = await _userService.DeleteOneUser(userName);
 
                 if (result.Succeeded)
                 {

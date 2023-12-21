@@ -1,10 +1,14 @@
 ﻿using Entities.Dtos.AddressDtos;
 using Entities.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Services.Contracts;
 
 namespace UserProject.Controllers
 {
+    [Route("api/addresses")]
+    [ApiController]
+    [Authorize(Roles = "User")]
     public class AddressController : ControllerBase
     {
         private readonly IAddressService _addressService;

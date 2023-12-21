@@ -5,11 +5,13 @@ using Microsoft.AspNetCore.Mvc;
 using Entities.Dtos.CompanyDto;
 using Entities.Models;
 using Services.Contracts;
+using Microsoft.AspNetCore.Authorization;
 
 namespace UserProject.Controllers
 {
     [Route("api/companies")]
     [ApiController]
+    [Authorize(Roles = "User")]
     public class CompanyController : ControllerBase
     {
         private readonly ICompanyService _companyService;

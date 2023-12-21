@@ -8,8 +8,9 @@ using Services.Contracts;
 
 namespace UserProject.Controllers
 {
-    [Route("api/auth")]
+    
     [ApiController]
+    [Route("api/auth")]
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;
@@ -25,16 +26,23 @@ namespace UserProject.Controllers
             
             var result = await _authService.RegisterUser(userDto);
 
-            if (result.Succeeded)
+            if (!result.Succeeded)
             {
-                return Ok(result);
+                return BadRequest(result.Errors);
             }
 
-            return BadRequest(result.Errors);
-            
+            return StatusCode(201);
         }
 
-        
+        [HttpPost("login")]
+        public async Task<IActionResult> Authenticate([FromBody] UserForAuthenticationDto userDto)
+        {
+            if (!await _authService.ValidateUser(userDto))
+            {
+                return Unauthorized();
+            }
+            return Ok(new { Token = await _authService.CreateToken() });
+        }
     }
 }
 
