@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Entities.Dtos.AddressDtos;
 using Entities.Dtos.UserDto;
+using Entities.Exceptions;
 using Entities.Models;
 using Microsoft.EntityFrameworkCore;
 using Repositories;
@@ -31,19 +32,19 @@ namespace Services
         {
             if (addressDto == null)
             {
-                throw new ArgumentNullException(nameof(addressDto));
+                throw new AddressNotFoundException();
             }
 
             var user = await _context.Users.Where(u => u.Id == userId && u.IsDeleted == false).FirstOrDefaultAsync();
             if (user == null)
             {
-                throw new Exception("The User is null");
+                throw new UserNotFoundException(userId);
             }
 
             var addressEntity = await _context.Addresses.Where(u => u.ApplicationUserId == userId && u.IsDeleted == false).FirstOrDefaultAsync();
             if (addressEntity != null)
             {
-                throw new Exception("The User already has an address");
+                throw new UserHasAddressException();
             }
 
             var address = _mapper.Map<Address>(addressDto);
@@ -60,17 +61,17 @@ namespace Services
         {
             if (addressDto == null)
             {
-                throw new ArgumentNullException(nameof(addressDto));
+                throw new AddressNotFoundException();
             }
             var user = await _context.Users.Where(u => u.Id == userId && u.IsDeleted == false).FirstOrDefaultAsync();
             if (user == null)
             {
-                throw new ArgumentNullException(nameof(user));
+                throw new UserNotFoundException(userId);
             }
             var addressEntity = await _context.Addresses.Include(u => u.Geo).Where(u => u.ApplicationUserId == userId && u.IsDeleted == false).FirstOrDefaultAsync();
             if (addressEntity == null)
             {
-                throw new Exception("The User don't have an address");
+                throw new UserHasNoAddressException();
             }
 
             var address = _mapper.Map<Address>(addressDto);
@@ -87,12 +88,12 @@ namespace Services
             var user = await _context.Users.Where(u => u.Id == userId && u.IsDeleted == false).FirstOrDefaultAsync();
             if (user == null)
             {
-                throw new ArgumentNullException(nameof(user));
+                throw new UserNotFoundException(userId);
             }
             var addressEntity = await _context.Addresses.Include(u => u.Geo).Where(u => u.ApplicationUserId == userId && u.IsDeleted == false).FirstOrDefaultAsync();
             if (addressEntity == null)
             {
-                throw new Exception("The User don't have an address");
+                throw new UserHasNoAddressException();
             }
             await _manager.GeoLocation.DeleteGeoLocationAsync(addressEntity.Geo);
             await _manager.Address.DeleteAddressAsync(addressEntity);
@@ -105,7 +106,7 @@ namespace Services
 
             if (address == null)
             {
-                throw new ArgumentNullException(nameof(address));
+                throw new AddressNotFoundException(userId);
             }
             var addressDto = _mapper.Map<IEnumerable<AddressForReadDto>>(address);
             return addressDto;

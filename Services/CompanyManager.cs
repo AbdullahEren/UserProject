@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Entities.Dtos.CompanyDto;
+using Entities.Exceptions;
 using Entities.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -33,7 +34,7 @@ namespace Services
         {
             if (companyDto == null)
             {
-                throw new ArgumentNullException(nameof(companyDto));
+                throw new CompanyNotFoundException();
             }
             var company = _mapper.Map<Company>(companyDto);
 
@@ -47,7 +48,7 @@ namespace Services
             var companyEntity = await _manager.Company.GetCompanyAsync(companyId, false);
             if (companyEntity == null)
             {
-                throw new ArgumentNullException(nameof(companyEntity));
+                throw new CompanyNotFoundException(companyId);
             }
 
             var usersWithCompany = await _context.Users.Where(u => u.CompanyId == companyId).ToListAsync();
@@ -74,7 +75,7 @@ namespace Services
             var company = await _manager.Company.GetCompanyAsync(companyId, trackChanges);
             if (company == null)
             {
-                throw new ArgumentNullException(nameof(company));
+                throw new CompanyNotFoundException(companyId);
             }
             return company;
         }
@@ -84,7 +85,7 @@ namespace Services
             var companyEntity = await _manager.Company.GetCompanyAsync(companyId, false);
             if (companyEntity == null)
             {
-                throw new ArgumentNullException(nameof(companyEntity));
+                throw new CompanyNotFoundException(companyId);
             }
             var company = _mapper.Map<Company>(companyDto);
             await _manager.Company.UpdateCompanyAsync(companyId, company);

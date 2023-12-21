@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Entities.Dtos.UserDto;
+using Entities.Exceptions;
 using Entities.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -39,7 +40,7 @@ namespace Services
             var user = await _context.Users.Where(u => u.UserName == userName && u.IsDeleted == false).FirstOrDefaultAsync();
             if (user == null)
             {
-                throw new ArgumentNullException(nameof(user));
+                throw new UserNotFoundException(userName);
             }
             user.IsDeleted = true;
             var address = await _context.Addresses.Where(u => u.ApplicationUserId.Equals(user.Id)).FirstOrDefaultAsync();
@@ -78,11 +79,11 @@ namespace Services
                 .Include(u => u.Address)
                 .ThenInclude(a => a.Geo)
                 .Where(u => u.UserName == userName && u.IsDeleted == false)
-                .ToListAsync();
+                .FirstOrDefaultAsync();
 
             if (user == null)
             {
-                throw new ArgumentNullException(nameof(user));
+                throw new UserNotFoundException(userName);
             }
 
             var userDto = _mapper.Map<IEnumerable<UserForReadDto>>(user);
@@ -97,7 +98,7 @@ namespace Services
             var company = await _manager.Company.GetCompanyAsync(userDto.CompanyId,false);
             if (company == null)
             {
-                throw new Exception("Company can not found");
+                throw new CompanyNotFoundException(userDto.CompanyId);
             }
             var result = await _userManager.CreateAsync(user, userDto.Password);
             if (result.Succeeded)
@@ -114,13 +115,13 @@ namespace Services
             var company = await _manager.Company.GetCompanyAsync(userDto.CompanyId, false);
             if (company == null)
             {
-                throw new ArgumentNullException(nameof(company));
+                throw new CompanyNotFoundException(userDto.CompanyId);
             }
 
             var userEntity = await _context.Users.Where(u => u.UserName == userName && u.IsDeleted == false).FirstOrDefaultAsync();
             if (userEntity == null)
             {
-                throw new ArgumentNullException(nameof(userEntity));
+                throw new UserNotFoundException(userName);
             }
 
             _mapper.Map(userDto, userEntity);

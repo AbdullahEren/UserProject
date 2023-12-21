@@ -22,21 +22,16 @@ namespace UserProject.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] UserForRegistrationDto userDto)
         {
-            try
-            {
-                var result = await _authService.RegisterUser(userDto);
+            
+            var result = await _authService.RegisterUser(userDto);
 
-                if (result.Succeeded)
-                {
-                    return Ok("User registered successfully");
-                }
-
-                return BadRequest(result.Errors);
-            }
-            catch (Exception ex)
+            if (result.Succeeded)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                return Ok(result);
             }
+
+            return BadRequest(result.Errors);
+            
         }
 
         
