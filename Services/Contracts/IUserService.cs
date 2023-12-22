@@ -10,7 +10,7 @@ namespace Services.Contracts
 {
     public interface IUserService
     {
-        Task<IEnumerable<UserForReadDto>> GetOneUser(string userName);
+        Task<UserForReadDto> GetOneUser(string userName);
         Task<IEnumerable<UserForReadDto>> GetAllUsers();
         Task<IdentityResult> UpdateUser(string userName, UserForUpdateDto userDto);
         Task<IdentityResult> DeleteOneUser(string userName);

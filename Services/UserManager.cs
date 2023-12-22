@@ -25,10 +25,10 @@ namespace Services
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RepositoryContext _context;
         private readonly ILogger<AuthManager> _logger;
-
+        private readonly ICacheService _cache;
         private ApplicationUser? _user;
 
-        public UserManager(IRepositoryManager manager, IMapper mapper, IConfiguration configuration, UserManager<ApplicationUser> userManager, RepositoryContext context, ILogger<AuthManager> logger)
+        public UserManager(IRepositoryManager manager, IMapper mapper, IConfiguration configuration, UserManager<ApplicationUser> userManager, RepositoryContext context, ILogger<AuthManager> logger, ICacheService cache)
         {
             _manager = manager;
             _mapper = mapper;
@@ -36,56 +36,85 @@ namespace Services
             _userManager = userManager;
             _context = context;
             _logger = logger;
+            _cache = cache;
         }
 
         public async Task<IEnumerable<UserForReadDto>> GetAllUsers()
         {
-            var users = await _userManager.Users
-                .Include(u => u.Company)
-                .Include(u => u.Address)
-                .ThenInclude(a => a.Geo)
-                .Where(u => u.IsDeleted == false)
-                .ToListAsync();
-
-            return _mapper.Map<IEnumerable<UserForReadDto>>(users);
-        }
-
-        public async Task<IEnumerable<UserForReadDto>> GetOneUser(string userName)
-        {
-            var user = await _userManager.Users
-                .Include(u => u.Company)
-                .Include(u => u.Address)
-                .ThenInclude(a => a.Geo)
-                .Where(u => u.UserName == userName && u.IsDeleted == false)
-                .ToListAsync();
-
-            if (user == null)
+            var cacheKey = "AllUsers";
+            var cachedUsers = await _cache.GetAsync(cacheKey, async () =>
             {
-                throw new UserNotFoundException(userName);
-            }
+                var users = await _userManager.Users
+                    .Include(u => u.Company)
+                    .Include(u => u.Address)
+                    .ThenInclude(a => a.Geo)
+                    .Where(u => u.IsDeleted == false)
+                    .ToListAsync();
 
-            var userDto = _mapper.Map<IEnumerable<UserForReadDto>>(user);
+                var userDtos = _mapper.Map<IEnumerable<UserForReadDto>>(users);
+                return userDtos.ToList();
+            });
 
-            return userDto;
+            return cachedUsers;
         }
+
+        public async Task<UserForReadDto> GetOneUser(string userName)
+        {
+            var cacheKey = $"User:{userName}";
+            var cachedUser = await _cache.GetAsync(cacheKey, async () =>
+            {
+                var user = await _userManager.Users
+                    .Include(u => u.Company)
+                    .Include(u => u.Address)
+                    .ThenInclude(a => a.Geo)
+                    .Where(u => u.UserName == userName && u.IsDeleted == false)
+                    .FirstOrDefaultAsync();
+
+                if (user == null)
+                {
+                    throw new UserNotFoundException(userName);
+                }
+
+                var userDto = _mapper.Map<UserForCacheReadDto>(user);
+                return userDto;
+            });
+            var userForReadDto = _mapper.Map<UserForReadDto>(cachedUser);
+            return userForReadDto;
+        }
+
 
         public async Task<IdentityResult> UpdateUser(string userName, UserForUpdateDto userDto)
         {
-            var company = await _manager.Company.GetCompanyAsync(userDto.CompanyId, false);
-            if (company == null)
+            var companyEntity = await _cache.GetAsync($"Company:{userDto.CompanyId}", async () =>
             {
-                throw new CompanyNotFoundException(userDto.CompanyId);
-            }
-
-            var userEntity = await _context.Users.Where(u => u.UserName == userName && u.IsDeleted == false).FirstOrDefaultAsync();
-            if (userEntity == null)
+                var company = await _manager.Company.GetCompanyAsync(userDto.CompanyId, false);
+                if (company == null)
+                {
+                    throw new CompanyNotFoundException(userDto.CompanyId);
+                }
+                return company;
+            });
+            
+            var userEntity = await _cache.GetAsync($"User:{userName}", async () =>
             {
-                throw new UserNotFoundException(userName);
-            }
+                var user = await _context.Users.Where(u => u.UserName == userName && u.IsDeleted == false).FirstOrDefaultAsync();
 
-            _mapper.Map(userDto, userEntity);
-            var result = await _userManager.UpdateAsync(userEntity);
+                if (user == null)
+                {
+                    throw new UserNotFoundException(userName);
+                }
+                var userCache = _mapper.Map<UserForCacheReadDto>(user);
+                return userCache;
+            });
 
+            var userCache = _mapper.Map<UserForCacheUpdateDto>(userEntity);
+            userCache = _mapper.Map(userDto, userCache);
+            var user = _mapper.Map<ApplicationUser>(userCache);
+            var result = await _userManager.UpdateAsync(user);
+            
+            await _cache.RemoveAsync($"User:{userName}");
+            await _cache.RemoveAsync("AllUsers");
+            
             return result;
         }
 
@@ -109,6 +138,10 @@ namespace Services
                     geo.IsDeleted = true;
                 }
             }
+            
+            await _cache.RemoveAsync($"Address:{user.Id}");
+            await _cache.RemoveAsync($"User:{userName}");
+            await _cache.RemoveAsync("AllUsers");
             var result = await _userManager.UpdateAsync(user);
             return result;
         }

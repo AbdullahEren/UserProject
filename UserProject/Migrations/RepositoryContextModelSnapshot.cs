@@ -94,7 +94,7 @@ namespace UserProject.Migrations
                         new
                         {
                             Id = 1,
-                            ConcurrencyStamp = "8cd93a37-ff70-4069-a36d-ad4d3b99bed5",
+                            ConcurrencyStamp = "cfc47c97-9877-4aa5-8226-0e961d6e92cb",
                             Name = "User",
                             NormalizedName = "USER"
                         });

@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.OpenApi.Models;
+using StackExchange.Redis;
 
 
 namespace UserProject.Infrastructure.Extensions
@@ -41,7 +42,7 @@ namespace UserProject.Infrastructure.Extensions
             services.AddScoped<IUserService, UserManager>();
             services.AddScoped<IAddressService, AddressManager>();
             services.AddScoped<ICompanyService, CompanyManager>();
-
+            services.AddSingleton<ICacheService, RedisManager>();
             services.AddAutoMapper(typeof(MappingProfile).Assembly);
         }
 
@@ -113,6 +114,16 @@ namespace UserProject.Infrastructure.Extensions
                 });
             });
         }
+
+        public static void RedisConnection(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddStackExchangeRedisCache(options =>
+            {
+                string connection = configuration.GetConnectionString("Redis");
+                options.Configuration = connection;
+            });
+        }
+
         public static async Task SeedUsersAsync(IServiceProvider serviceProvider)
         {
             UserManager<ApplicationUser> userManager = serviceProvider
@@ -353,7 +364,8 @@ namespace UserProject.Infrastructure.Extensions
             foreach (var userToAdd in usersToAdd)
             {
                 ApplicationUser user = await userManager.FindByNameAsync(userToAdd.UserName);
-                if (user is null)
+                var userCount = await userManager.Users.CountAsync();
+                if (user is null && userCount < 10)
                 {
                     user = userToAdd;
                     var result = await userManager.CreateAsync(user, "eren123");

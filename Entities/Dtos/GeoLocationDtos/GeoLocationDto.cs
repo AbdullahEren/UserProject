@@ -10,8 +10,7 @@ namespace Entities.Dtos.GeoLocationDtos
 {
     public record GeoLocationDto
     {
-        [JsonIgnore]
-        public int? Id { get; init; }
+        
         [Required(ErrorMessage = "Latitude is required.")]
         public decimal Lat { get; init; }
 

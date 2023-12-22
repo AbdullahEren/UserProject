@@ -13,10 +13,12 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.ConfigureSwagger();
 
 builder.Services.ConfigureDbContext(builder.Configuration);
+builder.Services.RedisConnection(builder.Configuration);
 builder.Services.ConfigureRepositories();
 builder.Services.ConfigureServices();
 builder.Services.ConfigureIdentity();
 builder.Services.ConfigureJWT(builder.Configuration);
+builder.Services.AddDistributedMemoryCache();
 
 var app = builder.Build();
 

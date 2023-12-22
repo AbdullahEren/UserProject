@@ -29,7 +29,17 @@ namespace UserProject.Infrastructure.Mapper
             CreateMap<AddressForUpdateDto, Address>();
             CreateMap<Address, AddressForReadDto>();
             CreateMap<AddressForReadDto, Address>();
-            
+            CreateMap<UserForCacheReadDto, ApplicationUser>();
+            CreateMap<ApplicationUser, UserForCacheReadDto>();
+            CreateMap<UserForCacheReadDto, UserForReadDto>();
+            CreateMap<UserForReadDto, UserForCacheReadDto>();
+            CreateMap<UserForCacheReadDto, UserForCacheUpdateDto>();
+            CreateMap<UserForCacheUpdateDto, UserForCacheReadDto>();
+            CreateMap<UserForCacheUpdateDto, ApplicationUser>();
+            CreateMap<ApplicationUser, UserForCacheUpdateDto>();
+            CreateMap<UserForUpdateDto, UserForCacheUpdateDto>();
+            CreateMap<UserForCacheUpdateDto, UserForUpdateDto>();
+
 
         }
     }

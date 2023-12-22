@@ -29,10 +29,11 @@ namespace Services
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RepositoryContext _context;
         private readonly ILogger<AuthManager> _logger;
+        private readonly ICacheService _cache;  
 
         private ApplicationUser? _user;
 
-        public AuthManager(IRepositoryManager manager, IMapper mapper, IConfiguration configuration, UserManager<ApplicationUser> userManager, RepositoryContext context, ILogger<AuthManager> logger)
+        public AuthManager(IRepositoryManager manager, IMapper mapper, IConfiguration configuration, UserManager<ApplicationUser> userManager, RepositoryContext context, ILogger<AuthManager> logger, ICacheService cache)
         {
             _manager = manager;
             _mapper = mapper;
@@ -40,6 +41,7 @@ namespace Services
             _userManager = userManager;
             _context = context;
             _logger = logger;
+            _cache = cache;
         }
 
         public async Task<string> CreateToken()
@@ -48,20 +50,6 @@ namespace Services
             var claims = await GetClaims();
             var tokenOptions = GenerateTokenOptions(signinCredentials, claims);
             return new JwtSecurityTokenHandler().WriteToken(tokenOptions);
-            //var refreshToken = GenerateRefreshToken();
-            //_user.RefreshToken = refreshToken;
-
-            //if (populateExp)
-            //    _user.RefreshTokenExpiryTime = DateTime.Now.AddDays(7);
-
-            //await _userManager.UpdateAsync(_user);
-
-            //var accessToken = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
-            //return new TokenDto()
-            //{
-            //    AccessToken = accessToken,
-            //    RefreshToken = refreshToken
-            //};
         }
 
         public async Task<IdentityResult> RegisterUser(UserForRegistrationDto userDto)
@@ -77,6 +65,7 @@ namespace Services
             {
                 await _userManager.AddToRoleAsync(user, "User");
             }
+            await _cache.RemoveAsync("AllUsers");
             return result;
         }
 
