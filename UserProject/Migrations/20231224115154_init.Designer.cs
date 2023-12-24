@@ -12,7 +12,7 @@ using Repositories;
 namespace UserProject.Migrations
 {
     [DbContext(typeof(RepositoryContext))]
-    [Migration("20231222163218_init")]
+    [Migration("20231224115154_init")]
     partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -96,7 +96,7 @@ namespace UserProject.Migrations
                         new
                         {
                             Id = 1,
-                            ConcurrencyStamp = "cfc47c97-9877-4aa5-8226-0e961d6e92cb",
+                            ConcurrencyStamp = "380abd10-f377-4131-b51e-3f5db2ee325c",
                             Name = "User",
                             NormalizedName = "USER"
                         });

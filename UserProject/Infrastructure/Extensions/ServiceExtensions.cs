@@ -21,9 +21,16 @@ namespace UserProject.Infrastructure.Extensions
     {
         public static void ConfigureDbContext(this IServiceCollection services, IConfiguration configuration)
         {
+            var dbHost = configuration["DB_HOST"];
+            var dbPort = configuration["DB_PORT"];
+            var dbName = configuration["DB_NAME"];
+            var dbUser = configuration["DB_USER"];
+            var dbPassword = configuration["DB_PASSWORD"];
+
+            var mssqlconnection = $"Server={dbHost},{dbPort};Database={dbName};User Id={dbUser};Password={dbPassword};MultipleActiveResultSets=true;TrustServerCertificate=True";
+
             services.AddDbContext<RepositoryContext>(options =>
-                           options.UseSqlServer(configuration.GetConnectionString("mssqlconnection"),
-                                              b => b.MigrationsAssembly("UserProject")));
+                           options.UseSqlServer(mssqlconnection, b => b.MigrationsAssembly("UserProject")));
 
             
         }
@@ -119,7 +126,9 @@ namespace UserProject.Infrastructure.Extensions
         {
             services.AddStackExchangeRedisCache(options =>
             {
-                string connection = configuration.GetConnectionString("Redis");
+                var host = configuration["REDIS_HOST"];
+                var port = configuration["REDIS_PORT"];
+                var connection = $"{host}:{port}";
                 options.Configuration = connection;
             });
         }
