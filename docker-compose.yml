@@ -17,7 +17,7 @@ services:
        DB_USER: "sa"
        DB_PORT: "1433"
        DB_NAME: "UserProjectDb"
-       DB_PASSWORD: "ENTER_YOUR_SA_PASSWORD"
+       DB_PASSWORD: "Erena_112263"
        REDIS_HOST: "redis"
        REDIS_PORT: "6379"
 
@@ -34,7 +34,7 @@ services:
       - "1433:1433"
     environment:
        ACCEPT_EULA: "Y"
-       SA_PASSWORD: "ENTER_YOUR_SA_PASSWORD"
+       SA_PASSWORD: "Erena_112263"
        MSSQL_PID: Express
 
 

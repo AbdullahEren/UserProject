@@ -13,6 +13,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.OpenApi.Models;
 using StackExchange.Redis;
+using Services.Hubs;
 
 
 namespace UserProject.Infrastructure.Extensions
@@ -32,7 +33,6 @@ namespace UserProject.Infrastructure.Extensions
             services.AddDbContext<RepositoryContext>(options =>
                            options.UseSqlServer(mssqlconnection, b => b.MigrationsAssembly("UserProject")));
 
-            
         }
 
         public static void ConfigureRepositories(this IServiceCollection services)
@@ -51,6 +51,16 @@ namespace UserProject.Infrastructure.Extensions
             services.AddScoped<ICompanyService, CompanyManager>();
             services.AddSingleton<ICacheService, RedisManager>();
             services.AddAutoMapper(typeof(MappingProfile).Assembly);
+            services.AddTransient<NotificationHub>();
+        }
+
+        public static void CorsConfiguration(this IServiceCollection services)
+        {
+            services.AddCors(options => options.AddDefaultPolicy(policy =>
+                            policy.AllowAnyMethod()
+                                  .AllowAnyHeader()
+                                  .AllowCredentials()
+                                  .SetIsOriginAllowed(origin => true)));
         }
 
         public static void ConfigureIdentity(this IServiceCollection services)
@@ -129,6 +139,7 @@ namespace UserProject.Infrastructure.Extensions
                 var host = configuration["REDIS_HOST"];
                 var port = configuration["REDIS_PORT"];
                 var connection = $"{host}:{port}";
+                //connection = configuration.GetConnectionString("Redis");
                 options.Configuration = connection;
             });
         }
@@ -145,7 +156,7 @@ namespace UserProject.Infrastructure.Extensions
                 .ServiceProvider
                 .GetRequiredService<RoleManager<ApplicationRole>>();
 
-            var rolesToAdd = new string[] { "User", "User", "User", "User", "User", "User", "User", "User", "User", "User" };
+            var rolesToAdd = new string[] { "Admin", "Admin", "User", "User", "User", "User", "User", "User", "User", "User" };
 
             foreach (var role in rolesToAdd)
             {
@@ -199,6 +210,7 @@ namespace UserProject.Infrastructure.Extensions
                             Lng = -34.4618M
                         }
                     }
+
                 },
                 new ApplicationUser
                 {
@@ -373,6 +385,7 @@ namespace UserProject.Infrastructure.Extensions
             foreach (var userToAdd in usersToAdd)
             {
                 ApplicationUser user = await userManager.FindByNameAsync(userToAdd.UserName);
+                var userIndex = Array.IndexOf(usersToAdd, userToAdd);
                 var userCount = await userManager.Users.CountAsync();
                 if (user is null && userCount < 10)
                 {
@@ -384,7 +397,8 @@ namespace UserProject.Infrastructure.Extensions
                         throw new Exception($"Kullanıcı eklenirken hata oluştu: {user.UserName}");
                     }
 
-                    await userManager.AddToRolesAsync(user, rolesToAdd);
+                    var userRole = rolesToAdd[userIndex];
+                    await userManager.AddToRoleAsync(user, userRole);
                 }
             }
         }

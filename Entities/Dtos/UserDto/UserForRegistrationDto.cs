@@ -34,6 +34,8 @@ namespace Entities.Dtos.UserDto
         [Required(ErrorMessage = "Company Id is required.")]
         [ForeignKey(nameof(Company))]
         public int CompanyId { get; init; }
+        [Required(ErrorMessage = "Role are required.")]
+        public string? Role { get; set; }
 
     }
 }

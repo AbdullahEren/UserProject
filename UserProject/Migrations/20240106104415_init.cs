@@ -229,7 +229,11 @@ namespace UserProject.Migrations
             migrationBuilder.InsertData(
                 table: "AspNetRoles",
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
-                values: new object[] { 1, "380abd10-f377-4131-b51e-3f5db2ee325c", "User", "USER" });
+                values: new object[,]
+                {
+                    { 1, "b1df6a7b-8f7f-431a-8ae2-9b04e2d8075e", "Admin", "ADMIN" },
+                    { 2, "6ce420cc-c7b7-4334-818c-89b0613725d8", "User", "USER" }
+                });
 
             migrationBuilder.InsertData(
                 table: "Companies",

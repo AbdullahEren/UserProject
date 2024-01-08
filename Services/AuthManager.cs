@@ -3,6 +3,7 @@ using Entities.Dtos.UserDto;
 using Entities.Exceptions;
 using Entities.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -17,6 +18,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using Services.Hubs;
 using System.Threading.Tasks;
 
 namespace Services
@@ -27,13 +29,23 @@ namespace Services
         private readonly IMapper _mapper;
         private readonly IConfiguration _configuration;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly RoleManager<ApplicationRole> _roleManager;
         private readonly RepositoryContext _context;
         private readonly ILogger<AuthManager> _logger;
-        private readonly ICacheService _cache;  
+        private readonly ICacheService _cache;
+        private readonly NotificationHub _notificationHub;
 
         private ApplicationUser? _user;
 
-        public AuthManager(IRepositoryManager manager, IMapper mapper, IConfiguration configuration, UserManager<ApplicationUser> userManager, RepositoryContext context, ILogger<AuthManager> logger, ICacheService cache)
+        public AuthManager(IRepositoryManager manager, 
+                           IMapper mapper, 
+                           IConfiguration configuration, 
+                           UserManager<ApplicationUser> userManager, 
+                           RepositoryContext context, 
+                           ILogger<AuthManager> logger, 
+                           ICacheService cache, 
+                           RoleManager<ApplicationRole> roleManager,
+                           NotificationHub notificationHub)
         {
             _manager = manager;
             _mapper = mapper;
@@ -42,6 +54,8 @@ namespace Services
             _context = context;
             _logger = logger;
             _cache = cache;
+            _roleManager = roleManager;
+            _notificationHub = notificationHub;
         }
 
         public async Task<string> CreateToken()
@@ -55,16 +69,25 @@ namespace Services
         public async Task<IdentityResult> RegisterUser(UserForRegistrationDto userDto)
         {
             var user = _mapper.Map<ApplicationUser>(userDto);
-            var company = await _manager.Company.GetCompanyAsync(userDto.CompanyId,false);
+            var company = await _manager.Company.GetCompanyAsync(userDto.CompanyId, false);
             if (company == null)
             {
                 throw new CompanyNotFoundException(userDto.CompanyId);
             }
+
+            var role = await _roleManager.FindByNameAsync(userDto.Role);
+            if (role == null)
+            {
+                throw new RoleNotFoundException();
+            }
+
             var result = await _userManager.CreateAsync(user, userDto.Password);
             if (result.Succeeded)
             {
-                await _userManager.AddToRoleAsync(user, "User");
+                await _userManager.AddToRoleAsync(user, userDto.Role);
+                await _notificationHub.SendNotify(user.UserName);
             }
+
             await _cache.RemoveAsync("AllUsers");
             return result;
         }
