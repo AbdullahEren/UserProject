@@ -14,6 +14,9 @@ using System.Text;
 using Microsoft.OpenApi.Models;
 using StackExchange.Redis;
 using Services.Hubs;
+using MassTransit;
+using Services.Events.EventConsumer;
+using Services.Events.EventBus;
 
 
 namespace UserProject.Infrastructure.Extensions
@@ -52,6 +55,8 @@ namespace UserProject.Infrastructure.Extensions
             services.AddSingleton<ICacheService, RedisManager>();
             services.AddAutoMapper(typeof(MappingProfile).Assembly);
             services.AddTransient<NotificationHub>();
+            services.AddTransient<IEventBus, EventBus>();
+
         }
 
         public static void CorsConfiguration(this IServiceCollection services)
@@ -139,8 +144,29 @@ namespace UserProject.Infrastructure.Extensions
                 var host = configuration["REDIS_HOST"];
                 var port = configuration["REDIS_PORT"];
                 var connection = $"{host}:{port}";
-                //connection = configuration.GetConnectionString("Redis");
                 options.Configuration = connection;
+            });
+        }
+
+        public static void ConfigureMassTransit(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddMassTransit(busConfigurator =>
+            {
+                busConfigurator.SetKebabCaseEndpointNameFormatter();
+
+                busConfigurator.AddConsumer<UserCreatedEventConsumer>();
+
+                busConfigurator.UsingRabbitMq((context, configurator) =>
+                {
+
+                    configurator.Host(new Uri(configuration["MessageBroker:Host"]!), h =>
+                    {
+                        h.Username(configuration["MessageBroker:Username"]);
+                        h.Password(configuration["MessageBroker:Password"]);
+                    });
+
+                    configurator.ConfigureEndpoints(context);
+                });
             });
         }
 

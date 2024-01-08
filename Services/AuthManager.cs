@@ -20,6 +20,8 @@ using System.Security.Cryptography;
 using System.Text;
 using Services.Hubs;
 using System.Threading.Tasks;
+using Services.Events.EventBus;
+using Services.Events.EventModels;
 
 namespace Services
 {
@@ -34,6 +36,7 @@ namespace Services
         private readonly ILogger<AuthManager> _logger;
         private readonly ICacheService _cache;
         private readonly NotificationHub _notificationHub;
+        private readonly IEventBus _eventBus;
 
         private ApplicationUser? _user;
 
@@ -45,7 +48,8 @@ namespace Services
                            ILogger<AuthManager> logger, 
                            ICacheService cache, 
                            RoleManager<ApplicationRole> roleManager,
-                           NotificationHub notificationHub)
+                           NotificationHub notificationHub,
+                           IEventBus eventBus)
         {
             _manager = manager;
             _mapper = mapper;
@@ -56,6 +60,7 @@ namespace Services
             _cache = cache;
             _roleManager = roleManager;
             _notificationHub = notificationHub;
+            _eventBus = eventBus;
         }
 
         public async Task<string> CreateToken()
@@ -85,7 +90,13 @@ namespace Services
             if (result.Succeeded)
             {
                 await _userManager.AddToRoleAsync(user, userDto.Role);
-                await _notificationHub.SendNotify(user.UserName);
+                //await _notificationHub.SendNotify(user.UserName);
+                await _eventBus.PublishAsync(new UserCreatedEvent
+                    {
+                        Id = user.Id,
+                        Email = user.Email,
+                        Content = $"Welcome to our company {user.Name}"
+                    });
             }
 
             await _cache.RemoveAsync("AllUsers");

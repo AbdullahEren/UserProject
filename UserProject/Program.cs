@@ -1,5 +1,7 @@
+using MassTransit;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using Repositories;
 using Services.Hubs;
 using System.Collections.Immutable;
@@ -18,6 +20,9 @@ builder.Services.ConfigureSwagger();
 builder.Services.CorsConfiguration();
 builder.Services.ConfigureDbContext(builder.Configuration);
 builder.Services.RedisConnection(builder.Configuration);
+
+builder.Services.ConfigureMassTransit(builder.Configuration);
+
 builder.Services.ConfigureRepositories();
 builder.Services.ConfigureServices();
 builder.Services.ConfigureIdentity();

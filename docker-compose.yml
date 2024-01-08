@@ -12,12 +12,13 @@ services:
     depends_on:
       - redis_image
       - sql
+      - rabbit_mq
     environment:
        DB_HOST: "sql"
        DB_USER: "sa"
        DB_PORT: "1433"
        DB_NAME: "UserProjectDb"
-       DB_PASSWORD: "Erena_112263"
+       DB_PASSWORD: "ENTER_YOUR_SA_PASSWORD"
        REDIS_HOST: "redis"
        REDIS_PORT: "6379"
 
@@ -34,7 +35,20 @@ services:
       - "1433:1433"
     environment:
        ACCEPT_EULA: "Y"
-       SA_PASSWORD: "Erena_112263"
+       SA_PASSWORD: "ENTER_YOUR_SA_PASSWORD"
        MSSQL_PID: Express
+
+  rabbit_mq:
+    image: rabbitmq:3.11.7-management
+    container_name: Queue
+    hostname: userproject-queue
+    volumes:
+      - ./.containers/queue/data/:/var/lib/rabbitmq
+      - ./.containers/queue/log/:/var/log/rabbitmq 
+    environment:
+       RABBITMQ_DEFAULT_USER: guest
+       RABBITMQ_DEFAULT_PASS: guest
+    ports:
+      - "15672:15672"
 
 
