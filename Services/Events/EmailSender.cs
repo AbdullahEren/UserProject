@@ -17,10 +17,10 @@ namespace Services.Events
             smtpClient.Port = 587;
             smtpClient.EnableSsl = true;
 
-            NetworkCredential credential = new System.Net.NetworkCredential("userproject1234@outlook.com", "123abc78");
+            NetworkCredential credential = new System.Net.NetworkCredential("yourSenderEmail@outlook.com", "yourPassword");
             smtpClient.Credentials = credential;
 
-            MailAddress sender = new MailAddress("userproject1234@outlook.com", "User Project");
+            MailAddress sender = new MailAddress("yourSenderEmail@outlook.com", "User Project");
             MailAddress receiver = new MailAddress(email);
 
             MailMessage mail = new MailMessage(sender,receiver);
